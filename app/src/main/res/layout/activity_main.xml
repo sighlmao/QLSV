@@ -69,18 +69,18 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btninsert"
+            android:id="@+id/btnthem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="INSERT" />
+            android:text="Nhập" />
 
         <Button
-            android:id="@+id/btndelete"
+            android:id="@+id/btnxoa"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="DELETE" />
+            android:text="Xóa" />
     </LinearLayout>
 
     <LinearLayout
@@ -89,18 +89,18 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnupdate"
+            android:id="@+id/btnsua"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="UPDATE" />
+            android:text="Cập nhật" />
 
         <Button
-            android:id="@+id/btnquery"
+            android:id="@+id/btntimkiem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="QUERY" />
+            android:text="Tim Kiem" />
     </LinearLayout>
 
     <ImageView
