@@ -28,8 +28,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> myList;
     ArrayAdapter<String> myAdapter;
     SQLiteDatabase myDatabase;
+    String selectedMalop = null;
 
-    @SuppressLint({"MissingInflatedId", "WrongViewCast"})
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         btnthem = findViewById(R.id.btnthem);
         btnxoa = findViewById(R.id.btnxoa);
         btnsua = findViewById(R.id.btnsua);
-        btntk = findViewById(R.id.btntimkiem);
+
 
         // Setup ListView
-        LV = findViewById(R.id.iv);
+        LV = findViewById(R.id.lv);
         myList = new ArrayList<>();
         myAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList);
         LV.setAdapter(myAdapter);
@@ -69,76 +70,76 @@ public class MainActivity extends AppCompatActivity {
         // Fetch and display data from the database
         fetchDataAndDisplay();
 
-        btnthem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String malop = edtmalop.getText().toString();
+        LV.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedItem = myList.get(position);
+            String[] parts = selectedItem.split(", ");
+            selectedMalop = parts[0].split(": ")[1];
+            String tenlop = parts[1].split(": ")[1];
+            int siso = Integer.parseInt(parts[2].split(": ")[1]);
+
+            edtmalop.setText(selectedMalop);
+            edttenlop.setText(tenlop);
+            edtsiso.setText(String.valueOf(siso));
+        });
+
+        btnthem.setOnClickListener(view -> {
+            String malop = edtmalop.getText().toString();
+            String tenlop = edttenlop.getText().toString();
+            int siso = Integer.parseInt(edtsiso.getText().toString());
+            ContentValues myValue = new ContentValues();
+            myValue.put("malop", malop);
+            myValue.put("tenlop", tenlop);
+            myValue.put("siso", siso);
+            String msg = "";
+            if (myDatabase.insert("tbllop", null, myValue) == -1) {
+                msg = "Thêm bị lỗi! Hãy thử lại.";
+            } else {
+                msg = "Thêm thành công";
+                fetchDataAndDisplay(); // Update the ListView after inserting new data
+            }
+            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+        });
+
+        btnxoa.setOnClickListener(view -> {
+            if (selectedMalop != null) {
+                int n = myDatabase.delete("tbllop", "malop = ?", new String[]{selectedMalop});
+                String msg = "";
+                if (n == 0) {
+                    msg = "Xóa không thành công";
+                } else {
+                    msg = n + " xóa thành công";
+                    fetchDataAndDisplay(); // Update the ListView after deleting data
+                    clearFields();
+                }
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Vui lòng chọn lớp để xóa", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnsua.setOnClickListener(view -> {
+            if (selectedMalop != null) {
                 String tenlop = edttenlop.getText().toString();
                 int siso = Integer.parseInt(edtsiso.getText().toString());
                 ContentValues myValue = new ContentValues();
-                myValue.put("malop", malop);
                 myValue.put("tenlop", tenlop);
                 myValue.put("siso", siso);
+                int n = myDatabase.update("tbllop", myValue, "malop = ?", new String[]{selectedMalop});
                 String msg = "";
-                if (myDatabase.insert("tbllop", null, myValue) == -1) {
-                    msg = "Thêm bị lỗi! Hãy thử lại.";
-                } else {
-                    msg = "Thêm thành công";
-                    fetchDataAndDisplay(); // Update the ListView after inserting new data
-                }
-                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnxoa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String malop = edtmalop.getText().toString();
-                int n = myDatabase.delete("tbllop", "malop = ?", new String[]{malop});
-                String msg = "";
-                if (n == 0){
-                    msg = "Xóa không thành công";
-                }else{
-                    msg=n+" xóa thành công";
-                }
-                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnsua.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int siso = Integer.parseInt(edtsiso.getText().toString());
-                String malop = edtmalop.getText().toString();
-                ContentValues myValue = new ContentValues();
-                myValue.put("siso", siso);
-                int n = myDatabase.update("tbllop", myValue, "malop = ?", new String[]{malop});
-                String msg="";
-                if (n == 0){
+                if (n == 0) {
                     msg = "Chỉnh sửa không thành công";
-                }else{
-                    msg = n +" chỉnh sửa thành công";
+                } else {
+                    msg = n + " chỉnh sửa thành công";
+                    fetchDataAndDisplay(); // Update the ListView after updating data
+                    clearFields();
                 }
-                Toast.makeText(MainActivity.this, msg,Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Vui lòng chọn lớp để chỉnh sửa", Toast.LENGTH_SHORT).show();
             }
         });
 
-        btntk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                myList.clear();
-                Cursor c = myDatabase.query("tbllop", null, null,null,null, null,null);
-                c.moveToNext();
-                String data = "";
-                while(c.isAfterLast() == false){
-                    data = c.getString(0)+" - "+c.getString(1)+" - "+c.getString(2);
-                    c.moveToNext();
-                    myList.add(data);
-                }
-                c.close();
-                myAdapter.notifyDataSetChanged();
-            }
-        });
+        btntk.setOnClickListener(view -> fetchDataAndDisplay());
     }
 
     private void fetchDataAndDisplay() {
@@ -154,5 +155,12 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
         myAdapter.notifyDataSetChanged();
+    }
+
+    private void clearFields() {
+        edtmalop.setText("");
+        edttenlop.setText("");
+        edtsiso.setText("");
+        selectedMalop = null;
     }
 }
