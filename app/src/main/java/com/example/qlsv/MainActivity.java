@@ -1,6 +1,5 @@
 package com.example.qlsv;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,14 +22,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     EditText edtmalop, edttenlop, edtsiso;
-    Button btnthem, btnxoa, btnsua, btntk;
+    Button btnthem, btnxoa, btnsua;
     ListView LV;
     ArrayList<String> myList;
     ArrayAdapter<String> myAdapter;
     SQLiteDatabase myDatabase;
     String selectedMalop = null;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,13 +40,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        edtmalop = findViewById(R.id.edtmalop);
-        edttenlop = findViewById(R.id.edttenlop);
-        edtsiso = findViewById(R.id.edtsiso);
-        btnthem = findViewById(R.id.btnthem);
-        btnxoa = findViewById(R.id.btnxoa);
-        btnsua = findViewById(R.id.btnsua);
-
+        edtmalop = findViewById(R.id.edtMaLop);
+        edttenlop = findViewById(R.id.edtTenLop);
+        edtsiso = findViewById(R.id.edtSiSo);
+        btnthem = findViewById(R.id.btnThem);
+        btnxoa = findViewById(R.id.btnXoa);
+        btnsua = findViewById(R.id.btnSua);
 
         // Setup ListView
         LV = findViewById(R.id.lv);
@@ -138,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Vui lòng chọn lớp để chỉnh sửa", Toast.LENGTH_SHORT).show();
             }
         });
-
-        btntk.setOnClickListener(view -> fetchDataAndDisplay());
     }
 
     private void fetchDataAndDisplay() {
